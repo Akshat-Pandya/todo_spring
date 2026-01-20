@@ -5,6 +5,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,6 +31,8 @@ public class User {
     private String username;
     private String email;
     private String password;
+    @Column(nullable = false)
+    private String role; // ROLE_USER
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL , orphanRemoval = true) 
     @JsonIgnore // ignore this field when serializing to JSON to prevent infinite recursion
     private List<Todo> todos; // User.todos is just a relationship field, not a DB column

@@ -6,49 +6,64 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pandastudios.todo.entity.Todo;
+import com.pandastudios.todo.entity.User;
 import com.pandastudios.todo.service.TodoService;
+import com.pandastudios.todo.service.UserService;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/todos")
 public class TodoController {
 
+    private static final Logger log = LoggerFactory.getLogger(TodoController.class);
+
     private final TodoService todoService;
-    public TodoController(TodoService todoService) {
+    private final UserService userService;
+
+    public TodoController(TodoService todoService, UserService userService) {
         this.todoService = todoService;
+        this.userService = userService;
     }
 
-    @PostMapping("/{userId}")
-    public Todo createTodo(@RequestBody Todo todo, @PathVariable Long userId) {
-        return todoService.createTodo(todo, userId);
+    @PostMapping
+    public Todo create(@RequestBody Todo todo, Principal principal) {
+        User user = userService.getByUsername(principal.getName());
+        log.info("Creating todo for user={}", user.getUsername());
+        return todoService.create(todo, user);
     }
 
-    @GetMapping("/{userId}")
-    public List<Todo> getAll(@PathVariable Long userId) {
-        return todoService.getAllTodos(userId);
+    @GetMapping
+    public List<Todo> all(Principal principal) {
+        User user = userService.getByUsername(principal.getName());
+        return todoService.getAll(user);
     }
 
-    @GetMapping("/{userId}/{todoId}")
-    public Todo getOne(@PathVariable Long userId, @PathVariable Long todoId) {
-        return todoService.getTodoById(todoId, userId);
+    @GetMapping("/{id}")
+    public Todo one(@PathVariable Long id, Principal principal) {
+        User user = userService.getByUsername(principal.getName());
+        return todoService.get(id, user);
     }
 
-    @PutMapping("/{userId}/{todoId}")
-    public Todo update(
-            @PathVariable Long userId,
-            @PathVariable Long todoId,
-            @RequestBody Todo todo) {
-        return todoService.updateTodo(todoId, userId, todo);
+    @PutMapping("/{id}")
+    public Todo update(@PathVariable Long id, @RequestBody Todo todo, Principal principal) {
+        User user = userService.getByUsername(principal.getName());
+        log.info("Updating todo id={} for user={}", id, user.getUsername());
+        return todoService.update(id, user, todo);
     }
 
-    @DeleteMapping("/{userId}/{todoId}")
-    public void delete(@PathVariable Long userId, @PathVariable Long todoId) {
-        todoService.deleteTodo(todoId, userId);
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id, Principal principal) {
+        User user = userService.getByUsername(principal.getName());
+        log.warn("Deleting todo id={} for user={}", id, user.getUsername());
+        todoService.delete(id, user);
     }
 }

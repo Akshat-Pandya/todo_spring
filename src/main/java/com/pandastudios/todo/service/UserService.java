@@ -1,43 +1,50 @@
 package com.pandastudios.todo.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 import com.pandastudios.todo.entity.User;
+import com.pandastudios.todo.exception.ResourceNotFoundException;
 import com.pandastudios.todo.repository.UserRepository;
 
 @Service
 @Transactional
 public class UserService {
-    @Autowired
-    private UserRepository userRepository;
-    
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder encoder;
+
+    public UserService(UserRepository repo, PasswordEncoder encoder) {
+        this.userRepository = repo;
+        this.encoder = encoder;
+    }
+
+    public User getByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    }
 
     public User createUser(User user) {
-        user.setPassword(user.getPassword());
+        user.setPassword(encoder.encode(user.getPassword()));
+        user.setRole("ROLE_USER");
         return userRepository.save(user);
     }
-    public User getUserById(Long id) {
-        return userRepository.findById(id).orElseThrow();
-    }
+
     public User updateUser(Long id, User user) {
-        User existingUser = userRepository.findById(id).orElseThrow();
-        if(user.getUsername() != null && !user.getUsername().isEmpty()) 
-            existingUser.setUsername(user.getUsername());
+        User existing = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        if(user.getEmail() != null && !user.getEmail().isEmpty()) 
-            existingUser.setEmail(user.getEmail());
+        if (user.getUsername() != null) existing.setUsername(user.getUsername());
+        if (user.getEmail() != null) existing.setEmail(user.getEmail());
+        if (user.getPassword() != null)
+            existing.setPassword(encoder.encode(user.getPassword()));
 
-        if(user.getPassword() != null && !user.getPassword().isEmpty()) 
-            existingUser.setPassword(user.getPassword());
-
-        return userRepository.save(existingUser);
+        return userRepository.save(existing);
     }
+
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
 }
-
-

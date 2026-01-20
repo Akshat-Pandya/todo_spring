@@ -1,4 +1,4 @@
-package com.pandastudios.todo.service.security;
+package com.pandastudios.todo.security;
 
 import java.util.Collection;
 import java.util.List;

@@ -24,6 +24,7 @@ public class GlobalExceptionHandler {
                 .body(error(HttpStatus.UNAUTHORIZED, ex.getMessage()));
     }
 
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGeneric(Exception ex) {
         return ResponseEntity

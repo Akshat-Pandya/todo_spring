@@ -1,4 +1,4 @@
-package com.pandastudios.todo.service.security;
+package com.pandastudios.todo.security;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,7 +19,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username)
-                .map(CustomUserDetails::new)
+                .map(CustomUserDetails::new) // wrap User in CustomUserDetails and return to Spring Security
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 }
+

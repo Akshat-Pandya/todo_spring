@@ -5,8 +5,10 @@ import java.util.List;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pandastudios.todo.config.RabbitConfig;
 import com.pandastudios.todo.entity.Todo;
 import com.pandastudios.todo.entity.User;
+import com.pandastudios.todo.events.TodoEvent;
 import com.pandastudios.todo.service.TodoService;
 import com.pandastudios.todo.service.UserService;
 
@@ -14,6 +16,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.MessageDeliveryMode;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +33,8 @@ public class TodoController {
 
     private final TodoService todoService;
     private final UserService userService;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     public TodoController(TodoService todoService, UserService userService) {
         this.todoService = todoService;
@@ -38,7 +45,21 @@ public class TodoController {
     public Todo create(@RequestBody Todo todo, Principal principal) {
         User user = userService.getByUsername(principal.getName());
         log.info("Creating todo for user={}", user.getUsername());
-        return todoService.create(todo, user);
+        Todo saved= todoService.create(todo, user);
+        // publish event 
+        TodoEvent todoEvent=new TodoEvent();
+        todoEvent.setTitle(saved.getTitle());
+        todoEvent.setUserId(saved.getUser().getId());
+        todoEvent.setTodoId(saved.getId());
+
+        rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE_NAME, RabbitConfig.ROUTING_KEY, todoEvent,
+            message -> {
+                message.getMessageProperties().setDeliveryMode(MessageDeliveryMode.PERSISTENT);
+                return message;
+            }
+        );
+
+        return saved;
     }
 
     @GetMapping

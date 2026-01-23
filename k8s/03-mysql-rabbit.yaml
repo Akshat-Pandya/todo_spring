@@ -7,6 +7,7 @@ spec:
     app: mysql
   ports:
     - port: 3306
+      targetPort: 3306
   type: ClusterIP
 ---
 apiVersion: apps/v1
@@ -33,13 +34,6 @@ spec:
           value: "todo_db"
         ports:
         - containerPort: 3306
-        resources:
-          requests:
-            cpu: 200m
-            memory: 512Mi
-          limits:
-            cpu: 500m
-            memory: 1Gi
 ---
 apiVersion: v1
 kind: Service
@@ -49,7 +43,12 @@ spec:
   selector:
     app: rabbitmq
   ports:
-    - port: 5672
+    - name: amqp
+      port: 5672
+      targetPort: 5672
+    - name: management
+      port: 15672
+      targetPort: 15672
   type: ClusterIP
 ---
 apiVersion: apps/v1
@@ -76,10 +75,4 @@ spec:
           value: "password"
         ports:
         - containerPort: 5672
-        resources:
-          requests:
-            cpu: 200m
-            memory: 512Mi
-          limits:
-            cpu: 500m
-            memory: 1Gi
+        - containerPort: 15672

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: todo-app
-        image: akshatpandya04/todo-app:latest
+        image: akshatpandya04/todo-app:1.0
         ports:
         - containerPort: 8080
         env:

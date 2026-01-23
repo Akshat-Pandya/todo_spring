@@ -33,6 +33,13 @@ spec:
           value: "todo_db"
         ports:
         - containerPort: 3306
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits:
+            cpu: 500m
+            memory: 1Gi
 ---
 apiVersion: v1
 kind: Service
@@ -69,3 +76,10 @@ spec:
           value: "password"
         ports:
         - containerPort: 5672
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits:
+            cpu: 500m
+            memory: 1Gi

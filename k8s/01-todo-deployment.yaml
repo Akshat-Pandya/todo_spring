@@ -32,3 +32,10 @@ spec:
           value: "user"
         - name: SPRING_RABBITMQ_PASSWORD
           value: "password"
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits:
+            cpu: 500m
+            memory: 1Gi

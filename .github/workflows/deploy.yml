@@ -15,7 +15,7 @@ jobs:
       GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
       GKE_ZONE: ${{ secrets.GKE_ZONE }}
       GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
-      GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+      GCP_SA_KEY: ${{ secrets.GCP_GKE_SA_KEY }}
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
@@ -38,7 +38,7 @@ jobs:
           gcloud config set project $GCP_PROJECT
           gcloud config set compute/zone $GKE_ZONE
           gcloud container clusters get-credentials $GKE_CLUSTER
-      
+
 
 
       - name: Log in to Docker Hub

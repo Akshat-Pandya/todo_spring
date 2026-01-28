@@ -6,6 +6,7 @@ on:
       - 'src/**'
       - 'Dockerfile'
       - 'pom.xml'
+      - '.github/workflows/deploy.yml'
 
 jobs:
   build-and-deploy:
@@ -37,7 +38,7 @@ jobs:
           gcloud config set project $GCP_PROJECT
           gcloud config set compute/zone $GKE_ZONE
           gcloud container clusters get-credentials $GKE_CLUSTER
-      
+
 
       - name: Log in to Docker Hub
         run: |

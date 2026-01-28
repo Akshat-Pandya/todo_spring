@@ -33,11 +33,12 @@ jobs:
 
       - name: Authenticate and configure GKE
         run: |
-          echo $GCP_GKE_SA_KEY > $HOME/gcloud-key.json
+          printf '%s' "$GCP_GKE_SA_KEY" > $HOME/gcloud-key.json
           gcloud auth activate-service-account --key-file=$HOME/gcloud-key.json
           gcloud config set project $GCP_PROJECT
           gcloud config set compute/zone $GKE_ZONE
           gcloud container clusters get-credentials $GKE_CLUSTER
+      
 
 
       - name: Log in to Docker Hub

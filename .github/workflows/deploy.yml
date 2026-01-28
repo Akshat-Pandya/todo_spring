@@ -24,7 +24,7 @@ jobs:
 
       - name: Write GCP SA key to file
         run: |
-          echo "${{ secrets.GCP_GKE_SA_KEY }}" > $HOME/gcloud-key.json
+          echo '${{ secrets.GCP_GKE_SA_KEY }}' > $HOME/gcloud-key.json
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1

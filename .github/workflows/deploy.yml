@@ -15,7 +15,6 @@ jobs:
       GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
       GKE_ZONE: ${{ secrets.GKE_ZONE }}
       GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
-      GCP_SA_KEY: ${{ secrets.GCP_GKE_SA_KEY }}
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
@@ -23,21 +22,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Cloud SDK for GKE
-         uses: google-github-actions/setup-gcloud@v1
-         with:
-           service_account_key: ${{ secrets.GCP_GKE_SA_KEY }}
-           project_id: ${{ secrets.GCP_PROJECT }}
-           export_default_credentials: true
-        
+      - name: Write GCP SA key to file
+        run: |
+          echo "${{ secrets.GCP_GKE_SA_KEY }}" > $HOME/gcloud-key.json
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          service_account_key: $HOME/gcloud-key.json
+          project_id: ${{ secrets.GCP_PROJECT }}
+          export_default_credentials: true
 
       - name: Authenticate and configure GKE
         run: |
-          gcloud config set project $GCP_PROJECT
-          gcloud config set compute/zone $GKE_ZONE
-          gcloud container clusters get-credentials $GKE_CLUSTER
-
-
+          gcloud auth activate-service-account --key-file=$HOME/gcloud-key.json
+          gcloud config set project ${{ secrets.GCP_PROJECT }}
+          gcloud config set compute/zone ${{ secrets.GKE_ZONE }}
+          gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER }}
 
       - name: Log in to Docker Hub
         run: |

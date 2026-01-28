@@ -32,13 +32,9 @@ jobs:
         env:
           GCP_SA_KEY_JSON: ${{ secrets.GCP_GKE_SA_KEY_B64 }}
 
-      - name: Decode service account key
-        run: |
-          echo "${GCP_SA_KEY_JSON}" | base64 --decode > $HOME/gcloud-key.json
-
       - name: Authenticate and configure GKE
         run: |
-          gcloud auth activate-service-account --key-file=$HOME/gcloud-key.json
+          gcloud auth activate-service-account --key-file=echo "${GCP_SA_KEY_JSON}" | base64 --decode
           gcloud config set project $GCP_PROJECT
           gcloud config set compute/zone $GKE_ZONE
           gcloud container clusters get-credentials $GKE_CLUSTER

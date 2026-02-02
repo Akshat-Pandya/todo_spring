@@ -9,7 +9,6 @@ import com.pandastudios.todo.entity.User;
 import com.pandastudios.todo.security.JwtUtil;
 import com.pandastudios.todo.service.UserService;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
@@ -46,7 +45,7 @@ public class AuthController {
     }
 
     @GetMapping("/test")
-    public String testEndpoint(String param) {
+    public String testEndpoint(String params ) {
         return new String("Todo-app : Test endpoint is working.");
     }
     

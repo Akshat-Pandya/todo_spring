@@ -33,12 +33,12 @@ public class TodoController {
 
     private final TodoService todoService;
     private final UserService userService;
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
-    public TodoController(TodoService todoService, UserService userService) {
+    public TodoController(TodoService todoService, UserService userService, RabbitTemplate rabbitTemplate) {
         this.todoService = todoService;
         this.userService = userService;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     @PostMapping
